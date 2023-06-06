@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+# Stop on err.
+set -e
+set -o pipefail
+
+# Args.
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+# Indent func.
+function indent() {
+    c='s/^/       /'
+case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+    esac
+}
+
+# Set working directory.
+cd $BUILD_DIR
+
+# Get compiler flags.
+FLAGS=`cat .buildpack/compiler_flags`
+
+# Compile.
+echo "-----> Compiling source"
+echo Compiling with g++ \
+    -o start \
+    start.cpp \
+    $FLAGS \
+    -lpthread -lcrypt -lz -lssl -lcrypto \
+    2>&1 | indent
+g++ \
+    -o start \
+    start.cpp \
+    $FLAGS \
+    -lpthread -lcrypt -lz -lssl -lcrypto \
+    2>&1 | indent
